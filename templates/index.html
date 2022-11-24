@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} URL {% endblock %}</h1>
+    {% for url_name in url_table %}
+        <div class='post'>
+            <p>{{ url_name['created'] }}</p>
+            <h2>{{ url_name['url_addr'] }}</h2>
+            <p>{{ url_name['content'] }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
