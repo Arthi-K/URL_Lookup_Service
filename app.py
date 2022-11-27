@@ -2,10 +2,20 @@ import sqlite3
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask import Flask, render_template
 from flask import jsonify
-import logging 
+import logging
+from flask_caching import Cache
+
+config = {
+    "DEBUG": True,          
+    "CACHE_TYPE": "RedisCache",  
+    "CACHE_DEFAULT_TIMEOUT": 3600
+}
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your secret key'
+# app.config['SECRET_KEY'] = 'your secret key'
+app.config.from_mapping(config)
+cache = Cache(app)
+
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
@@ -13,16 +23,13 @@ def get_db_connection():
     return conn
 
 @app.route('/v1/urlinfo/<url_addr>')
-
+@cache.cached(timeout=3600)
 def get_url(url_addr):
     conn = get_db_connection()
     mal_url = conn.execute('SELECT * FROM url_table WHERE url_addr = ?',
                      (url_addr,)).fetchone()
-    # app.logger.info('Small URL:', mal_url)
-    # for property, value in vars(mal_url).items():
-    #     app.logger.info(property, ":", value)
     conn.close()
-    if mal_url is None:
+    if mal_url is not None:
         return jsonify({
             "message": "Error",
         }), 403
@@ -31,6 +38,7 @@ def get_url(url_addr):
         }), 200
 
 @app.route('/')
+@cache.cached(timeout=3600)
 def index():
     conn = get_db_connection()
     url_table = conn.execute('SELECT * FROM url_table').fetchall()
@@ -38,6 +46,7 @@ def index():
     return render_template('index.html', url_table=url_table)
 
 @app.route('/create/', methods=('GET', 'POST'))
+@cache.cached(timeout=3600)
 def create():
     if request.method == 'POST':
         url_addr = request.form['title']
