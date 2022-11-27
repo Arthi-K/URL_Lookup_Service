@@ -1,27 +1,34 @@
 import sqlite3
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask import Flask, render_template
+from flask import jsonify
+import logging 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your secret key'
-
-
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
 
+@app.route('/v1/urlinfo/<url_addr>')
 
 def get_url(url_addr):
     conn = get_db_connection()
     mal_url = conn.execute('SELECT * FROM url_table WHERE url_addr = ?',
-                        (url_addr,)).fetchone()
+                     (url_addr,)).fetchone()
+    # app.logger.info('Small URL:', mal_url)
+    # for property, value in vars(mal_url).items():
+    #     app.logger.info(property, ":", value)
     conn.close()
     if mal_url is None:
-        abort(404)
-    return mal_url 
-
+        return jsonify({
+            "message": "Error",
+        }), 403
+    return jsonify({
+            "message": "Success",
+        }), 200
 
 @app.route('/')
 def index():
@@ -48,34 +55,6 @@ def create():
             conn.close()
             return redirect(url_for('index'))
     return render_template('create.html')
-
-# ...
-
-@app.route('/<string:url_addr>/edit/', methods=('GET', 'POST'))
-def edit(url_addr):
-    url_addr = get_url(url_addr)
-
-    if request.method == 'POST':
-        mal_url = request.form['title']
-        content = request.form['content']
-
-        if not mal_url:
-            flash('URL is required!')
-
-        elif not content:
-            flash('Content is required!')
-
-        else:
-            conn = get_db_connection()
-            conn.execute('UPDATE url_table SET content = ?'
-                         ' WHERE url_addr = ?',
-                         (content,url_addr))
-            conn.commit()
-            conn.close()
-            return redirect(url_for('index'))
-
-    return render_template('edit.html', url_addr=url_addr)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
