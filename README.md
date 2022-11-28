@@ -4,15 +4,18 @@ GET /v1/urlinfo/{resource_url_with_query_string}
 The caller wants to know if it is safe to access that URL or not. 
 
 ## Requirements: 
-python3 
-pip 
-Redis server 
+1. Python3
+2. pip
+3. Redis Server 
 
 ### Setup Instructions 
 **Clone the project from the git repository and run the following command in the directory where the project exists:**
  ```pip install -r requirements.txt```  
 
-## Commands to run
+**You can also use Homebrew to install Redis Server on MacOs:**
+```brew install redis```
+
+### Commands to run
 **To run the flask app, go to the src folder and run the command:**
 ```python3 -m flask run```
 
@@ -20,7 +23,7 @@ Redis server
 ```brew services start redis```
 
 **To run the unit tests for the app:**
- python3 -m pytest test/app_tests.py
+ ```python3 -m pytest test/app_tests.py```
 
 **To insert malware URL into the DB, type the URL and content in the textboxes:**
 http://127.0.0.1:5000/create/
