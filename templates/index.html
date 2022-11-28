@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} URL {% endblock %}</h1>
+    <h1>{% block title %} List of Malware URL {% endblock %}</h1>
     {% for url_name in url_table %}
         <div class='post'>
             <p>{{ url_name['created'] }}</p>
