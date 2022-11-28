@@ -13,8 +13,14 @@ def test_url_malware_403():
     assert res.json() == {"message": "Error: Malware URL",
                             "safe": False}
 
-def test_malformed_url_400():
+def test_malformed_url_with_http_400():
     res = requests.get("http://127.0.0.1:5000/v1/urlinfo/https://www.caet-org.com/secure/citibank.com.th/online%20upd")
+    assert res.status_code == 400
+    assert res.json() == {"message": "Bad Request Error, check the URL",
+                            "safe": False}
+
+def test_malformed_url_without_http_400():
+    res = requests.get("http://127.0.0.1:5000/v1/urlinfo/tiny.com")
     assert res.status_code == 400
     assert res.json() == {"message": "Bad Request Error, check the URL",
                             "safe": False}
