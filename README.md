@@ -43,14 +43,14 @@ http://127.0.0.1:5000/delete/https://ems-spotifyth.com/login/portal-delivery/Erv
 The screenshots for the above calls can be found in the assets folder
 
 ## Design Considerations: 
-**1.The size of the URL list could grow infinitely, how might you scale this beyond the memory capacity of the system?**
+**1. The size of the URL list could grow infinitely, how might you scale this beyond the memory capacity of the system?**
 
 - We can shard the data in multiple tables/database servers by hashing each URLs and partitioning horizontally based on alphabet ranges. This would help us locate the database quickly when we partition it based on a partiion key. We could also use consistent hashing to futher distribute the load evenly to avoid hotspot servers. This would be helpful even if we want to add more servers in the future with minimal data transfers between database servers.
 
-**2.The number of requests may exceed the capacity of this system, how might you solve that?**
+**2. The number of requests may exceed the capacity of this system, how might you solve that?**
 
 - We can cache frequently accessed URLs using DB cache like Redis/Memcached, which I have implemented in this project with Redis. This would decrease the number of queries made to the web server and database server. Further in order to scale, we can use pool of servers to distribute the requests evenly with help of a load balancer and ensure that load is balanced. We could also containarize the web servers and use memory and CPU efficiently to scale better. 
 
-**3.What are some strategies you might use to update the service with new URLs? Updates may be as many as 5000 URLs a day with updates arriving every 10 minutes.**
+**3. What are some strategies you might use to update the service with new URLs? Updates may be as many as 5000 URLs a day with updates arriving every 10 minutes.**
 
 - We can setup a seperate microservice to ingest new URL's and run this bulk insert as a cron job every 10 minutes. Another approach is to update as and when using a seperate insertion API (which I have implemented) to POST new URLs into the DB but that depends on business requirement if insertion can be done with some latency.
