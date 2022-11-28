@@ -9,7 +9,7 @@ pip
 Redis server 
 
 ### Setup Instructions 
-**Clone the project from the git repository and run the following command in the directory where the project exists: **
+**Clone the project from the git repository and run the following command in the directory where the project exists:**
  ```pip install -r requirements.txt```  
 
 ## Commands to run
