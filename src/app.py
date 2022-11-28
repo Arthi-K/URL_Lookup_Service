@@ -72,6 +72,7 @@ def deleteUrl(url_addr):
     conn = get_db_connection()
     conn.execute('DELETE FROM url_table WHERE url_addr = ?',
                      (url_addr,))
+    
     logging.info("Deleted successfully from the DB")
     conn.commit()
     conn.close()
@@ -86,7 +87,6 @@ def create():
     if request.method == 'POST':
         url_addr = request.form['title']
         content = request.form['content']
-        # if url_addr[-1] == '/': url_addr = url_addr[:-1]
         if not url_addr:
             logging.error("Malware URL needs to be provided")
             flash('Malware URL is required!')
