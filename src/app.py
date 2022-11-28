@@ -4,7 +4,7 @@ import sqlite3
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask import Flask, render_template
 from flask import jsonify
-import logging
+from flask.logging import create_logger
 from flask_caching import Cache
 template_dir = os.path.abspath('../templates/')
 config = {
@@ -17,11 +17,12 @@ app = Flask(__name__, template_folder=template_dir)
 app.config['SECRET_KEY'] = 'your secret key'
 app.config.from_mapping(config)
 cache = Cache(app)
+logging = create_logger(app)
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
-    app.logger.info("Connected Successfully to SQLite DB")
+    logging.info("Connected Successfully to SQLite DB")
     return conn
 
 def validate_url(url):
@@ -32,7 +33,7 @@ def validate_url(url):
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
             r'(?::\d+)?' # optional port
             r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    app.logger.info("Checking if the URL is Malformed")
+    logging.info("Checking if the URL is Malformed")
     return re.match(regex, url) is not None
 
 @app.route('/v1/urlinfo/<path:url_addr>')
@@ -71,7 +72,7 @@ def deleteUrl(url_addr):
     conn = get_db_connection()
     conn.execute('DELETE FROM url_table WHERE url_addr = ?',
                      (url_addr,))
-    app.logger.info("Deleted successfully from the DB")
+    logging.info("Deleted successfully from the DB")
     conn.commit()
     conn.close()
     
@@ -87,16 +88,16 @@ def create():
         content = request.form['content']
         # if url_addr[-1] == '/': url_addr = url_addr[:-1]
         if not url_addr:
-            app.logger.error("Malware URL needs to be provided")
+            logging.error("Malware URL needs to be provided")
             flash('Malware URL is required!')
         elif not content:
-            app.logger.error("Content needs to be provided")
+            logging.error("Content needs to be provided")
             flash('Content is required!')
         else:
             conn = get_db_connection()
             conn.execute('INSERT INTO url_table (url_addr, content) VALUES (?, ?)',
                          (url_addr, content))
-            app.logger.info("Inserted data successfully into the DB")
+            logging.info("Inserted data successfully into the DB")
             conn.commit()
             conn.close()
             return redirect(url_for('index'))
