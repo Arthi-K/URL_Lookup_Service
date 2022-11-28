@@ -9,7 +9,7 @@ from flask_caching import Cache
 template_dir = os.path.abspath('../templates/')
 config = {
     "DEBUG": True,          
-    "CACHE_TYPE": "null",  
+    "CACHE_TYPE": "RedisCache",  
     "CACHE_DEFAULT_TIMEOUT": 3600
 }
 
